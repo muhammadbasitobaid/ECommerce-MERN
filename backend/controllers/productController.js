@@ -1,8 +1,9 @@
 const Product = require("../models/productModel");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncError = require("../middleware/catchAsyncError");
+const Api = require("../utils/Api");
 
-// create a new product -- only Admin
+//! create a new product -- only Admin
 exports.createProduct = catchAsyncError(async (req, res) => {
   const product = await Product.create(req.body);
   res.status(201).json({
@@ -13,7 +14,12 @@ exports.createProduct = catchAsyncError(async (req, res) => {
 
 // get all products
 exports.getAllProducts = catchAsyncError(async (req, res) => {
-  const products = await Product.find();
+  const resultsPerPage = 2;
+  const apiObj = new Api(Product.find(), req.query)
+    .search()
+    .filter()
+    .pagination(resultsPerPage);
+  const products = await apiObj.query;
   res.status(200).json({
     success: true,
     products,
@@ -32,7 +38,7 @@ exports.getProductDetails = async (req, res, next) => {
   });
 };
 
-// update product
+//! update product --Admin
 exports.updateProduct = catchAsyncError(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
@@ -50,7 +56,7 @@ exports.updateProduct = catchAsyncError(async (req, res, next) => {
   });
 });
 
-// delete a product --Admin
+//! delete a product --Admin
 exports.deleteProduct = catchAsyncError(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
