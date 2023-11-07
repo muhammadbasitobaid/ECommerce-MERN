@@ -40,3 +40,18 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
 
   sendToken(user, 200, res);
 });
+
+//* Logout Controller
+exports.logoutUser = catchAsyncError(async (req, res, next) => {
+  const options = {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  };
+
+  // res.cookies("token", null, options);
+
+  res.status(200).cookie("token", null, options).json({
+    success: true,
+    message: "Logged Out",
+  });
+});
