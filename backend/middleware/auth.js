@@ -3,7 +3,7 @@ const catchAsyncError = require("./catchAsyncError");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-exports.isAuthenticated = catchAsyncError(async (req, res, next) => {
+exports.isAuthenticated = catchAsyncError(async (req, _, next) => {
   const { token } = req.cookies;
   if (!token) {
     return next(
@@ -16,3 +16,13 @@ exports.isAuthenticated = catchAsyncError(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+exports.isAuthorized =
+  (...allowedRoles) =>
+  (req, _, next) => {
+    if (!allowedRoles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(403, "You  are not allowed to access this route")
+      );
+    }
+  };
